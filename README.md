@@ -131,7 +131,7 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 
 ## Improvement
 
-The user's balance may be encrypted with AES. This matching engine should include Encryption and Decryption. You also may refactor the code in the main.rs because there are a lot repetition that can be unified in some function.
+The user's asset balance may be encrypted with AES. This matching engine should include Encryption and Decryption. You also may refactor the code in the main.rs because there are a lot repetition that can be unified in some function.
 
 ## Contact
 
