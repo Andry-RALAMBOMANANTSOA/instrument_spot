@@ -119,7 +119,7 @@ This project uses the following main dependencies:
 
 ## Related Repositories
 
-- [**shared_struct**](https://github.com/Andry-RALAMBOMANANTSOA/shared_structs_spot): Contains global structures that are utilized by the Instrument matching engine.
+- [**shared_struct_spot**](https://github.com/Andry-RALAMBOMANANTSOA/shared_structs_spot): Contains global structures that are utilized by the Instrument matching engine.
 
 ## Contributing
 
