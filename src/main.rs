@@ -5692,15 +5692,15 @@ tokio::task::spawn_blocking({//Market
     move || {  
 
     loop {
-     
+        let db1_market = Arc::clone(&db1_market);
+        let connection_type_map = Arc::clone(&connection_type_map);
+        let ws_connections = Arc::clone(&ws_connections);
+        let coll_config = Arc::clone(&coll_config);
         if let Ok(msg_a) = rx_market.recv() {
+            tokio::spawn(async move{
             match msg_a {
                 Structs::Last(msg) => {
-                    let db1_market = Arc::clone(&db1_market);
-                    let connection_type_map = Arc::clone(&connection_type_map);
-                    let ws_connections = Arc::clone(&ws_connections);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{ //Last
+                    //Last
                         
                         
                             if let Err(err) = insert_document_collection(&db1_market.db, &coll_config.coll_h_last, &msg).await {
@@ -5757,16 +5757,10 @@ tokio::task::spawn_blocking({//Market
                                 }
                             }   
                            
-                        
-                    });
-
+                            
                 }
                 Structs::MBPEvents(msg) => {
-                    let db1_market = Arc::clone(&db1_market);
-                    let connection_type_map = Arc::clone(&connection_type_map);
-                    let ws_connections = Arc::clone(&ws_connections);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{ // Mbpevent
+                    // Mbpevent
                                                
                             if let Err(err) = insert_document_collection(&db1_market.db, &coll_config.coll_h_mbpevent, &msg).await {
                                 eprintln!("DATABASE_INSERTION_FAILURE: {}", err);
@@ -5822,15 +5816,11 @@ tokio::task::spawn_blocking({//Market
                                 }
                             }  
                         
-                    });
+                   
                 }
                 
                 Structs::BBO(msg) => {
-                    let db1_market = Arc::clone(&db1_market);
-                    let connection_type_map = Arc::clone(&connection_type_map);
-                    let ws_connections = Arc::clone(&ws_connections);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{ //bbo
+                    //bbo
                        
                             if let Err(err) = insert_document_collection(&db1_market.db, &coll_config.coll_h_bbo, &msg).await {
                                 eprintln!("DATABASE_INSERTION_FAILURE: {}", err);
@@ -5886,14 +5876,10 @@ tokio::task::spawn_blocking({//Market
                                 }
                             } 
                         
-                    });
+                   
                 }
                 Structs::TimeSale(msg) => {
-                    let db1_market = Arc::clone(&db1_market);
-                    let connection_type_map = Arc::clone(&connection_type_map);
-                    let ws_connections = Arc::clone(&ws_connections);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{ //TNS
+                    //TNS
                        
                             if let Err(err) = insert_document_collection(&db1_market.db, &coll_config.coll_h_tns, &msg).await {
                                 eprintln!("DATABASE_INSERTION_FAILURE: {}", err);
@@ -5949,14 +5935,10 @@ tokio::task::spawn_blocking({//Market
                                 }
                             }
                         
-                    });
+                    
                 }
                 Structs::Volume(msg) => {
-                    let db1_market = Arc::clone(&db1_market);
-                    let connection_type_map = Arc::clone(&connection_type_map);
-                    let ws_connections = Arc::clone(&ws_connections);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{ //volume
+                    //volume
                        
                             if let Err(err) = insert_document_collection(&db1_market.db, &coll_config.coll_h_volume, &msg).await {
                                 eprintln!("DATABASE_INSERTION_FAILURE: {}", err);
@@ -6012,25 +5994,22 @@ tokio::task::spawn_blocking({//Market
                                 }
                             }  
 
-                    });
+                   
                 }
                 Structs::FullOB(msg) => {
-                    let db1_market = Arc::clone(&db1_market);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{ //fullob
+                    //fullob
                         
                             if let Err(err) = overwrite_document(&db1_market.db, &coll_config.coll_fullob, &msg).await {
                                 eprintln!("DATABASE_INSERTION_FAILURE: {}", err);
                                 return;  // Continue to the next iteration even if insertion fails
                             }    
                         
-                    });
-                   
+                     
                 }
                 
-
                 _ => {} 
             }
+        });
           
         }
     }
@@ -6043,103 +6022,87 @@ tokio::task::spawn_blocking({//Broker
     move || { 
     
     loop {
-       
+        let db1_broker = Arc::clone(&db1_broker);
+        let coll_config = Arc::clone(&coll_config);
+        let config_broker = Arc::clone(&config_broker);
+        let txb2 = Arc::clone(&txb2);
         if let Ok(msg_a) = rx_broker.recv() {
+            tokio::spawn(async move{
             match msg_a {
                 Structs::LimitOrder(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_lmtorder, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert LimitOrder: {:?}", e),
                         };
-                    });
+                  
                 }
                 Structs::MarketOrder(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_mktorder, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert LimitOrder: {:?}", e),
                         };
-                    });
+                    
                 }
                 Structs::StopOrder(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                    
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_sorder, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert LimitOrder: {:?}", e),
                         };
-                    });
+                   
                 }
                 Structs::StopLimitOrder(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_slorder, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert LimitOrder: {:?}", e),
                         };
-                    });
+                  
                 }
                 Structs::ModifyOrder(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_modforder, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert LimitOrder: {:?}", e),
                         };
-                    });
+                   
                 }
                 Structs::DeleteOrder(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                  
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_dltorder, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert LimitOrder: {:?}", e),
                         };
-                    });
+                  
                 }
                 Structs::TraderOrderStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                  
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_p_order, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert LimitOrder: {:?}", e),
                         };
-                    });
+                    
                 }
                 Structs::TraderStopOrderStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                    
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_p_sorder, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert LimitOrder: {:?}", e),
                         };
-                    });
+                   
                 }
                 Structs::TraderStopLimitOrderStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_p_slorder, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert LimitOrder: {:?}", e),
                         };
-                    });
+                    
                 }
                 Structs::DeletedOrderStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         let order_id = order.order_identifier;
                             match insert_document_collection(&db1_broker.db, &coll_config.coll_h_dltd_order, &order).await {
                                 Ok(_) => {},
@@ -6149,12 +6112,10 @@ tokio::task::spawn_blocking({//Broker
                                 Ok(_) => println!("Successfully deleted LimitOrder"),
                                 Err(e) => eprintln!("Failed to delete LimitOrder: {:?}", e),
                             };
-                    });
+                   
                 }
                 Structs::DeletedStopOrderStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         let order_id = order.order_identifier;
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_dltd_sorder, &order).await {
                             Ok(_) =>{},
@@ -6164,12 +6125,10 @@ tokio::task::spawn_blocking({//Broker
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to delete StopOrder: {:?}", e),
                         };
-                    });
+                   
                 }
                 Structs::DeletedStopLimitOrderStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         let order_id = order.order_identifier;
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_dltd_slorder, &order).await {
                             Ok(_) => {},
@@ -6179,12 +6138,10 @@ tokio::task::spawn_blocking({//Broker
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to delete StopOrder: {:?}", e),
                         };
-                    });
+                    
                 }
                 Structs::ModifiedOrderStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         let order_id = order.order_identifier;
                         let order_quant = order.new_order_quantity;
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_modfd_order, &order).await {
@@ -6195,12 +6152,10 @@ tokio::task::spawn_blocking({//Broker
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to modified limitOrder: {:?}", e),
                         };
-                    });
+                    
                 }
                 Structs::ModifiedStopOrderStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         let order_id = order.order_identifier;
                         let order_quant = order.new_order_quantity;
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_modfd_sorder, &order).await {
@@ -6211,12 +6166,10 @@ tokio::task::spawn_blocking({//Broker
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to modified limitOrder: {:?}", e),
                         };
-                    });
+                  
                 }
                 Structs::ModifiedStopLimitOrderStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         let order_id = order.order_identifier;
                         let order_quant = order.new_order_quantity;
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_modfd_slorder, &order).await {
@@ -6227,22 +6180,18 @@ tokio::task::spawn_blocking({//Broker
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to modified limitOrder: {:?}", e),
                         };
-                    });
+                    
                 }
                 Structs::Messaging(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_t_message, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert LimitOrder: {:?}", e),
                         };
-                    });
+                 
                 }
                 Structs::ExecutedStop(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                  
                         let order_id = order.order_identifier;
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_exctd_sorder, &order).await {
                             Ok(_) => {},
@@ -6252,12 +6201,10 @@ tokio::task::spawn_blocking({//Broker
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to delete StopOrder: {:?}", e),
                         };
-                    });
+                   
                 }
                 Structs::ExecutedStopLimit(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                  
                         let order_id = order.order_identifier;
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_exctd_slorder, &order).await {
                             Ok(_) => {},
@@ -6267,14 +6214,10 @@ tokio::task::spawn_blocking({//Broker
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to delete StopOrder: {:?}", e),
                         };
-                    });
+                   
                 }
                 Structs::MatchStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    let config_broker = Arc::clone(&config_broker);
-                    let txb2 = Arc::clone(&txb2);
-                    tokio::spawn(async move{
+                   
                         let oid_maker = order.order_identifier_maker;
                             let quant = order.order_quantity;
                             match insert_document_collection(&db1_broker.db, &coll_config.coll_h_match, &order).await {
@@ -6311,22 +6254,18 @@ tokio::task::spawn_blocking({//Broker
                             }
                             trader_info_taker(&order,&config_broker,&txb2);
                             trader_info_maker(&order,&config_broker,&txb2);
-                    });
+                   
                 }
                 Structs::DeleteIcebergOrder(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_dlticeberg, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert DeleteIcebergOrder: {:?}", e),
                         };
-                    });
+                    
                 }
                 Structs::DeletedIcebergStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         let id = order.iceberg_identifier;
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_dltd_iceberg, &order).await {
                             Ok(_) => {},
@@ -6336,12 +6275,10 @@ tokio::task::spawn_blocking({//Broker
                             Ok(_) => println!("Successfully deleted LimitOrder"),
                             Err(e) => eprintln!("Failed to delete LimitOrder: {:?}", e),
                         };
-                    });
+                  
                 }
                 Structs::ExecutedIceberg(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_exctd_iceberg, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert ExecutedIceberg: {:?}", e),
@@ -6373,22 +6310,18 @@ tokio::task::spawn_blocking({//Broker
                                     Err(e) => eprintln!("Failed to delete iceberg Order: {:?}", e),
                                 };
                             }
-                    });
+                  
                 }
                 Structs::IcebergOrder(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_iceberg, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert IcebergOrder: {:?}", e),
                         };
-                    });
+                  
                 }
                 Structs::ModifiedIcebergStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         let id = order.iceberg_identifier;
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_modfd_iceberg, &order).await {
                             Ok(_) => {},
@@ -6398,33 +6331,26 @@ tokio::task::spawn_blocking({//Broker
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to modified limitOrder: {:?}", e),
                         };
-                    });
+                   
                 }
                 Structs::ModifyIcebergOrder(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_modficeberg, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert ModifyIcebergOrder: {:?}", e),
                         };
-                    });
+                   
                 }
                 Structs::IcebergOrderStruct(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    tokio::spawn(async move{
+                   
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_p_iceberg, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert IcebergOrderStruct: {:?}", e),
                         };
-                    });
+                   
                 }
                 Structs::PostTraderInf(order) => {
-                    let db1_broker = Arc::clone(&db1_broker);
-                    let coll_config = Arc::clone(&coll_config);
-                    let config_broker = Arc::clone(&config_broker);
-                    tokio::spawn(async move{
+                   
                         match insert_document_collection(&db1_broker.db, &coll_config.coll_h_balcalc_no_cmmss, &order).await {
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to insert LimitOrder: {:?}", e),
@@ -6512,12 +6438,12 @@ tokio::task::spawn_blocking({//Broker
                             Ok(_) => {},
                             Err(e) => eprintln!("Failed to update balance asset b: {:?}", e),
                         };
-                    });
+                   
                 }
 
                 _ => {} 
             }
-           
+        }); 
           
         } 
     }
