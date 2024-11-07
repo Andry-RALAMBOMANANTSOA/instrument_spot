@@ -1,0 +1,11 @@
+{
+    "market_specification": {
+      "USDT_MGA": {
+        "tick_size": 10,
+        "min_quantity": 0.5,
+        "max_quantity": 1000.0,
+        "iceberg_min_quantity":1000.0
+      }
+      
+    }
+  }

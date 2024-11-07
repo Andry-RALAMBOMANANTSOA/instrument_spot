@@ -1,0 +1,7 @@
+{
+    "exchange":"TTEMAC-SPOT" ,
+    "market_name": "USDT_MGA",
+    "asset_a_name":"USDT",
+    "asset_b_name":"MGA"
+    
+  }
